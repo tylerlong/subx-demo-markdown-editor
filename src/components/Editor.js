@@ -2,23 +2,18 @@ import React from 'react'
 import { debounceTime, map } from 'rxjs/operators'
 
 class Editor extends React.Component {
-  constructor (props) {
-    super(props)
-    this.article = props.article
-    this.state = {
+  componentWillMount () {
+    this.article = this.props.article
+    this.setState({
       html: this.article.html()
-    }
-    this.propsChanged = () => this.forceUpdate()
-    this.htmlChanged = html => this.setState({ html })
+    })
     this.html$ = this.article.text$.pipe(debounceTime(1000), map(() => this.article.html()))
-  }
-  componentDidMount () {
-    this.article.text$.subscribe(this.propsChanged)
-    this.html$.subscribe(this.htmlChanged)
+    this.propsSubscription = this.article.text$.subscribe(() => this.forceUpdate())
+    this.htmlSubscription = this.html$.subscribe(html => this.setState({ html }))
   }
   componentWillUnmount () {
-    this.article.text$.unsubscribe(this.propsChanged)
-    this.html$.unsubscribe(this.htmlChanged)
+    this.propsSubscription.unsubscribe()
+    this.htmlSubscription.unsubscribe()
   }
   render () {
     console.log('render')
