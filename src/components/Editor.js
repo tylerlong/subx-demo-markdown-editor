@@ -5,10 +5,10 @@ class Editor extends React.Component {
   componentWillMount () {
     this.article = this.props.article
     this.setState({
-      html: this.article.html()
+      html: this.article.html
     })
-    this.html$ = this.article.text$.pipe(debounceTime(1000), map(() => this.article.html()))
-    this.propsSubscription = this.article.text$.subscribe(() => this.forceUpdate())
+    this.html$ = this.article.$.pipe(debounceTime(1000), map(() => this.article.html))
+    this.propsSubscription = this.article.$.subscribe(() => this.forceUpdate())
     this.htmlSubscription = this.html$.subscribe(html => this.setState({ html }))
   }
   componentWillUnmount () {
