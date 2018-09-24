@@ -1,15 +1,14 @@
 import React from 'react'
-import { debounceTime, map } from 'rxjs/operators'
+import { debounceTime } from 'rxjs/operators'
 
 class Editor extends React.Component {
   componentWillMount () {
     this.article = this.props.article
-    this.setState({
-      html: this.article.html
-    })
-    this.html$ = this.article.$.pipe(debounceTime(1000), map(() => this.article.html))
     this.propsSubscription = this.article.$.subscribe(() => this.forceUpdate())
-    this.htmlSubscription = this.html$.subscribe(html => this.setState({ html }))
+    this.htmlSubscription = this.article.$.pipe(debounceTime(1000)).subscribe(event => {
+      this.html = this.article.html
+      this.forceUpdate()
+    })
   }
   componentWillUnmount () {
     this.propsSubscription.unsubscribe()
@@ -21,7 +20,7 @@ class Editor extends React.Component {
       <div>
         <textarea placeholder='Please enter some markdown...' id='markdown-textarea'
           value={this.article.text} onChange={e => { this.article.text = e.target.value }} />
-        <div className='markdown-body' dangerouslySetInnerHTML={{ __html: this.state.html }} />
+        <div className='markdown-body' dangerouslySetInnerHTML={{ __html: this.html }} />
       </div>
     )
   }
